@@ -660,6 +660,84 @@ input[type='number'].input {
   max-width: 100%;
 }
 
+/* Location */
+
+.combobox {
+  position: relative;
+}
+
+.combobox__input {
+  padding-left: 36px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16' fill='none' stroke='%23767b82' stroke-width='1.5'%3E%3Ccircle cx='7' cy='7' r='4.5'/%3E%3Cpath d='M10.5 10.5L14 14'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: left 12px center;
+}
+
+.combobox__list {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  max-height: 320px;
+  margin: 0;
+  padding: 4px;
+  overflow-y: auto;
+  list-style: none;
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 8px 24px rgba(22, 24, 27, 0.12);
+}
+
+.combobox__list[hidden] {
+  display: none;
+}
+
+.combobox__option {
+  padding: 9px 10px;
+  border-radius: 2px;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.combobox__option[aria-selected='true'] {
+  background: var(--accent-soft);
+  color: var(--accent-hover);
+}
+
+.combobox__option--custom {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.combobox__option--custom:not(:first-child) {
+  margin-top: 4px;
+  border-top: 1px solid var(--line);
+}
+
+.combobox__add {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 1;
+}
+
+.combobox__status {
+  padding: 9px 10px;
+  font-size: 14px;
+  color: var(--ink-subtle);
+}
+
 /* Skills */
 
 .skills {

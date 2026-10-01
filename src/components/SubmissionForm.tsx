@@ -14,6 +14,8 @@ import { FIELD_ORDER, validateField, validateProfile } from '../lib/validation';
 import { CvUpload } from './CvUpload';
 import { Field, FieldError, RequiredMark, describedBy } from './Field';
 import { AlertIcon } from './Icons';
+import { LocationInput } from './LocationInput';
+import { RoleInput } from './RoleInput';
 import { SkillsInput } from './SkillsInput';
 
 const FIELD_IDS: Record<ProfileField, string> = {
@@ -34,7 +36,7 @@ const FIELD_IDS: Record<ProfileField, string> = {
   consent: 'consent',
 };
 
-type TextField = 'fullName' | 'email' | 'location' | 'desiredRole' | 'yearsExperience' | 'salaryAmount' | 'githubUrl' | 'portfolioUrl' | 'linkedinUrl';
+type TextField = 'fullName' | 'email' | 'yearsExperience' | 'salaryAmount' | 'githubUrl' | 'portfolioUrl' | 'linkedinUrl';
 
 const OPTIONAL_FIELDS: ReadonlySet<ProfileField> = new Set(['githubUrl', 'portfolioUrl', 'linkedinUrl']);
 
@@ -175,23 +177,40 @@ export function SubmissionForm({ onSubmitted }: SubmissionFormProps) {
             aria-describedby={describedBy(FIELD_IDS.email, 'hint', errors.email)}
           />
         </Field>
-        <Field id={FIELD_IDS.location} label="Location" required error={errors.location}>
-          <input
-            {...textProps('location')}
-            autoComplete="address-level2"
-            placeholder="City, country"
-            aria-describedby={describedBy(FIELD_IDS.location, undefined, errors.location)}
+        <Field
+          id={FIELD_IDS.location}
+          label="Location"
+          required
+          hint="Start typing and choose from the list. If your town is not listed, pick the nearest city or just your country."
+          error={errors.location}
+        >
+          <LocationInput
+            id={FIELD_IDS.location}
+            value={values.location}
+            onChange={(location) => update('location', location)}
+            onBlur={() => markTouched('location')}
+            invalid={Boolean(errors.location)}
+            describedBy={describedBy(FIELD_IDS.location, 'hint', errors.location)}
           />
         </Field>
       </Section>
 
       <Section number="02" title="Experience">
         <div className="form-grid form-grid--wide-first">
-          <Field id={FIELD_IDS.desiredRole} label="Desired role" required error={errors.desiredRole}>
-            <input
-              {...textProps('desiredRole')}
-              placeholder="Senior Frontend Engineer"
-              aria-describedby={describedBy(FIELD_IDS.desiredRole, undefined, errors.desiredRole)}
+          <Field
+            id={FIELD_IDS.desiredRole}
+            label="Desired role"
+            required
+            hint="Pick from the list, or type your own and choose Add."
+            error={errors.desiredRole}
+          >
+            <RoleInput
+              id={FIELD_IDS.desiredRole}
+              value={values.desiredRole}
+              onChange={(role) => update('desiredRole', role)}
+              onBlur={() => markTouched('desiredRole')}
+              invalid={Boolean(errors.desiredRole)}
+              describedBy={describedBy(FIELD_IDS.desiredRole, 'hint', errors.desiredRole)}
             />
           </Field>
           <Field id={FIELD_IDS.yearsExperience} label="Years of experience" required error={errors.yearsExperience}>

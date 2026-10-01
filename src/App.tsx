@@ -90,6 +90,18 @@ export default function App() {
           <a className="site-footer__link" href={COOKIE_POLICY_PATH}>
             Cookie policy
           </a>
+          <span>
+            Location data from{' '}
+            <a className="site-footer__link" href="https://www.geonames.org" target="_blank" rel="noopener">
+              GeoNames
+            </a>{' '}
+            (CC BY 4.0). Role list includes information from the{' '}
+            <a className="site-footer__link" href="https://www.onetcenter.org/database.html" target="_blank" rel="noopener">
+              O*NET 31.0 Database
+            </a>{' '}
+            by USDOL/ETA, used under CC BY 4.0. tkpool has modified this information; USDOL/ETA has not approved, endorsed, or
+            tested these modifications. O*NET® is a trademark of USDOL/ETA.
+          </span>
         </div>
       </footer>
     </>

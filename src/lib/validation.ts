@@ -66,8 +66,10 @@ export function validateField(field: ProfileField, values: ProfileFormValues): s
       return undefined;
     }
     case 'location':
+      if (!values.location.trim()) return 'Search for your city or country and choose it from the list.';
       return checkLength(values.location, 'location', 2, 120);
     case 'desiredRole':
+      if (!values.desiredRole.trim()) return 'Search for your role, or type your own and choose Add.';
       return checkLength(values.desiredRole, 'desired role', 2, 120);
     case 'yearsExperience': {
       const raw = values.yearsExperience.trim();
