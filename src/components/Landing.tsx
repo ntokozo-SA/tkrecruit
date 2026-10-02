@@ -95,7 +95,7 @@ export function HowItWorks() {
 
 export function GoodToKnow() {
   return (
-    <section className="section section--tinted" aria-labelledby="know-title">
+    <section id="what-to-expect" className="section section--tinted" aria-labelledby="know-title">
       <div className="container">
         <div className="section__header">
           <p className="eyebrow">Before you submit</p>

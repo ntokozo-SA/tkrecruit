@@ -21,6 +21,7 @@ const isCookiePolicy = window.location.pathname.replace(/\/+$/, '') === COOKIE_P
 export default function App() {
   const [submission, setSubmission] = useState<{ cvReplaced: boolean } | null>(null);
   const showNav = !submission && !isCookiePolicy;
+  const sectionBase = isCookiePolicy ? '/' : '';
 
   return (
     <>
@@ -84,24 +85,51 @@ export default function App() {
       </main>
 
       <footer className="site-footer">
-        <div className="container site-footer__inner">
-          <span>tkpool. A talent pool for developers open to new opportunities.</span>
-          <span>Submitting a profile does not guarantee employment, an interview, or recruiter contact.</span>
-          <a className="site-footer__link" href={COOKIE_POLICY_PATH}>
-            Cookie policy
-          </a>
-          <span>
-            Location data from{' '}
-            <a className="site-footer__link" href="https://www.geonames.org" target="_blank" rel="noopener">
-              GeoNames
-            </a>{' '}
-            (CC BY 4.0). Role list includes information from the{' '}
-            <a className="site-footer__link" href="https://www.onetcenter.org/database.html" target="_blank" rel="noopener">
-              O*NET 31.0 Database
-            </a>{' '}
-            by USDOL/ETA, used under CC BY 4.0. tkpool has modified this information; USDOL/ETA has not approved, endorsed, or
-            tested these modifications. O*NET® is a trademark of USDOL/ETA.
-          </span>
+        <div className="container">
+          <div className="site-footer__top">
+            <div className="site-footer__brand">
+              <Logo href={isCookiePolicy || submission ? '/' : '#top'} />
+              <p className="site-footer__tagline">A talent pool for developers open to new opportunities.</p>
+            </div>
+            <nav className="site-footer__nav" aria-label="Footer">
+              {!submission && (
+                <div className="site-footer__col">
+                  <p className="site-footer__heading">Candidates</p>
+                  <ul>
+                    <li>
+                      <a className="site-footer__link" href={`${sectionBase}#how-it-works`}>
+                        How it works
+                      </a>
+                    </li>
+                    <li>
+                      <a className="site-footer__link" href={`${sectionBase}#what-to-expect`}>
+                        What to expect
+                      </a>
+                    </li>
+                    <li>
+                      <a className="site-footer__link" href={`${sectionBase}#submit`}>
+                        Submit your profile
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              )}
+              <div className="site-footer__col">
+                <p className="site-footer__heading">Legal</p>
+                <ul>
+                  <li>
+                    <a className="site-footer__link" href={COOKIE_POLICY_PATH}>
+                      Cookie policy
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </nav>
+          </div>
+          <div className="site-footer__bottom">
+            <span>© {new Date().getFullYear()} tkpool. All rights reserved.</span>
+            <span>Submitting a profile does not guarantee employment, an interview, or recruiter contact.</span>
+          </div>
         </div>
       </footer>
     </>
