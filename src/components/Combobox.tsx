@@ -1,9 +1,76 @@
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
 import { loadSearchIndex, normalize, searchIndex, type SearchIndex } from '../lib/search';
 
-interface Option {
+export interface ComboboxOption {
   value: string;
   custom?: boolean;
+}
+
+interface ComboboxListProps {
+  id: string;
+  label: string;
+  show: boolean;
+  loading: boolean;
+  emptyText?: string;
+  options: ComboboxOption[];
+  activeIndex: number;
+  onActiveChange: (index: number) => void;
+  onSelect: (value: string) => void;
+}
+
+export function comboboxOptionId(listId: string, index: number): string {
+  return `${listId}-${index}`;
+}
+
+/** The listbox shared by the single-value combobox and the skills input. */
+export function ComboboxList({
+  id,
+  label,
+  show,
+  loading,
+  emptyText,
+  options,
+  activeIndex,
+  onActiveChange,
+  onSelect,
+}: ComboboxListProps) {
+  const listRef = useRef<HTMLUListElement>(null);
+
+  useEffect(() => {
+    listRef.current?.querySelector(`[data-index="${activeIndex}"]`)?.scrollIntoView({ block: 'nearest' });
+  }, [activeIndex, show]);
+
+  return (
+    <ul ref={listRef} id={id} role="listbox" aria-label={label} className="combobox__list" hidden={!show}>
+      {show && loading && <li className="combobox__status">Loading suggestions...</li>}
+      {show && !loading && emptyText && !options.length && <li className="combobox__status">{emptyText}</li>}
+      {show &&
+        options.map((option, i) => (
+          <li
+            key={`${option.custom ? 'custom' : 'match'}-${option.value}`}
+            id={comboboxOptionId(id, i)}
+            data-index={i}
+            role="option"
+            aria-selected={i === activeIndex}
+            className={`combobox__option${option.custom ? ' combobox__option--custom' : ''}`}
+            onMouseDown={(event) => event.preventDefault()}
+            onMouseMove={() => onActiveChange(i)}
+            onClick={() => onSelect(option.value)}
+          >
+            {option.custom ? (
+              <>
+                <span className="combobox__add" aria-hidden="true">
+                  +
+                </span>
+                Add “{option.value}”
+              </>
+            ) : (
+              option.value
+            )}
+          </li>
+        ))}
+    </ul>
+  );
 }
 
 export interface ComboboxProps {
@@ -50,12 +117,11 @@ export function Combobox({
   const [activeIndex, setActiveIndex] = useState(0);
   const [index, setIndex] = useState<SearchIndex | null>(null);
   const [loadFailed, setLoadFailed] = useState(false);
-  const listRef = useRef<HTMLUListElement>(null);
   const listId = `${id}-options`;
   const freeText = allowCustom || loadFailed;
 
-  const options = useMemo<Option[]>(() => {
-    const matches: Option[] = index ? search(index, query).map((match) => ({ value: match })) : [];
+  const options = useMemo<ComboboxOption[]>(() => {
+    const matches: ComboboxOption[] = index ? search(index, query).map((match) => ({ value: match })) : [];
     const custom = cleanCustom(query, maxLength);
     const listed = matches.some((option) => normalize(option.value) === normalize(custom));
     if (allowCustom && custom.length >= 2 && !listed) matches.push({ value: custom, custom: true });
@@ -63,10 +129,6 @@ export function Combobox({
   }, [index, query, search, allowCustom, maxLength]);
 
   const showList = open && query.trim().length > 0 && !loadFailed;
-
-  useEffect(() => {
-    listRef.current?.querySelector(`[data-index="${activeIndex}"]`)?.scrollIntoView({ block: 'nearest' });
-  }, [activeIndex, showList]);
 
   function ensureLoaded() {
     if (index || loadFailed) return;
@@ -115,9 +177,6 @@ export function Combobox({
     }
   }
 
-  const activeId = showList && options[activeIndex] ? `${listId}-${activeIndex}` : undefined;
-  const hasMatches = options.some((option) => !option.custom);
-
   return (
     <div className="combobox">
       <input
@@ -129,7 +188,7 @@ export function Combobox({
         aria-autocomplete="list"
         aria-expanded={showList}
         aria-controls={listId}
-        aria-activedescendant={activeId}
+        aria-activedescendant={showList && options[activeIndex] ? comboboxOptionId(listId, activeIndex) : undefined}
         aria-required="true"
         aria-invalid={invalid || undefined}
         aria-describedby={describedBy}
@@ -144,35 +203,17 @@ export function Combobox({
         onKeyDown={handleKeyDown}
         onBlur={handleBlur}
       />
-      <ul ref={listRef} id={listId} role="listbox" aria-label={listLabel} className="combobox__list" hidden={!showList}>
-        {showList && !index && <li className="combobox__status">Loading suggestions...</li>}
-        {showList && index && !hasMatches && !allowCustom && <li className="combobox__status">{noMatchesText}</li>}
-        {showList &&
-          options.map((option, i) => (
-            <li
-              key={`${option.custom ? 'custom' : 'match'}-${option.value}`}
-              id={`${listId}-${i}`}
-              data-index={i}
-              role="option"
-              aria-selected={i === activeIndex}
-              className={`combobox__option${option.custom ? ' combobox__option--custom' : ''}`}
-              onMouseDown={(event) => event.preventDefault()}
-              onMouseMove={() => setActiveIndex(i)}
-              onClick={() => select(option.value)}
-            >
-              {option.custom ? (
-                <>
-                  <span className="combobox__add" aria-hidden="true">
-                    +
-                  </span>
-                  Add “{option.value}”
-                </>
-              ) : (
-                option.value
-              )}
-            </li>
-          ))}
-      </ul>
+      <ComboboxList
+        id={listId}
+        label={listLabel}
+        show={showList}
+        loading={!index}
+        emptyText={allowCustom ? undefined : noMatchesText}
+        options={options}
+        activeIndex={activeIndex}
+        onActiveChange={setActiveIndex}
+        onSelect={select}
+      />
     </div>
   );
 }

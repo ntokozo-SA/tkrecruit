@@ -229,7 +229,7 @@ export function SubmissionForm({ onSubmitted }: SubmissionFormProps) {
           id={FIELD_IDS.skills}
           label="Skills"
           required
-          hint="Languages, frameworks, tools. Press Enter or use commas to add each one."
+          hint="Languages, frameworks, tools. Search and pick from the list, or type any skill and press Enter or a comma to add it."
           error={errors.skills}
         >
           <SkillsInput

@@ -791,6 +791,11 @@ input[type='number'].input {
   min-height: 44px;
 }
 
+.skills__search {
+  flex: 1;
+  min-width: 0;
+}
+
 .skills__count {
   font-family: var(--font-mono);
   font-size: 12px;

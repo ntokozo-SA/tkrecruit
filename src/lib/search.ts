@@ -6,11 +6,19 @@ export interface SearchEntry {
 
 export type SearchIndex = SearchEntry[];
 
-/** Lowercases, strips accents and punctuation so "zurich" finds "Zürich" and "st louis" finds "St. Louis". */
+/** Normalized shorthand mapped to what it stands for, e.g. { k8s: 'kubernetes' }. */
+export type Aliases = Record<string, string>;
+
+/**
+ * Lowercases, strips accents and punctuation so "zurich" finds "Zürich" and "st louis" finds "St. Louis".
+ * "#" and "++" are kept as letters so C, C# and C++ stay distinct.
+ */
 export function normalize(value: string): string {
   return value
     .normalize('NFD')
     .replace(/[\u0300-\u036f'’]/g, '')
+    .replace(/\+\+/g, 'pp')
+    .replace(/#/g, 'sharp')
     .toLowerCase()
     .replace(/[^\p{L}\p{N}]+/gu, ' ')
     .trim();
@@ -58,4 +66,24 @@ export function searchIndex(index: SearchIndex, query: string, limit = 8): strin
     else if (others.length < limit) others.push(label);
   }
   return [...exact, ...starts, ...others].slice(0, limit);
+}
+
+export function expandAliases(query: string, aliases: Aliases): string {
+  return Object.entries(aliases).reduce(
+    (text, [alias, full]) => text.replace(new RegExp(`(^| )${alias}( |$)`, 'g'), `$1${normalize(full)}$2`),
+    normalize(query),
+  );
+}
+
+/** Searches the query as typed and with shorthand expanded; expanded matches come first. */
+export function searchWithAliases(index: SearchIndex, query: string, aliases: Aliases, limit = 8): string[] {
+  const expanded = expandAliases(query, aliases);
+  if (expanded === normalize(query)) return searchIndex(index, query, limit);
+  return [...new Set([...searchIndex(index, expanded, limit), ...searchIndex(index, query, limit)])].slice(0, limit);
+}
+
+/** The listed label that matches the query exactly, ignoring case, accents and punctuation. */
+export function findExact(index: SearchIndex, query: string, aliases: Aliases = {}): string | undefined {
+  const candidates = new Set([` ${normalize(query)}`, ` ${expandAliases(query, aliases)}`]);
+  return index.find((entry) => candidates.has(entry.text))?.label;
 }
